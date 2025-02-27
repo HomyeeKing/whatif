@@ -25,4 +25,10 @@ test("orSome", () => {
   orSome([true, { key: "two", condition: true }], (p) => {
     expect(p.key).toBe(0)
   })
+
+  // key can be ignored
+  orSome([false, { condition: true, message: "condition two pass" }], (p) => {
+    expect(p.key).toBe(1)
+    expect(p.message).toBe("condition two pass")
+  })
 })

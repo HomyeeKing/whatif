@@ -1,5 +1,5 @@
 interface ObjectOrIf {
-  key: any
+  key?: any
   condition: boolean
   message?: string
 }
@@ -22,7 +22,7 @@ export function orSome<T = void>(
         condition: item,
       }
     }
-    return item
+    return { ...item, key: item.key ?? index }
   })
   if (!Array.isArray(formattedConditions)) {
     throw new Error("conditions must be an array")
