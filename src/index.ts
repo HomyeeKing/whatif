@@ -1,10 +1,11 @@
 interface ObjectOrIf {
   key?: any
-  condition: boolean
+  condition: boolean | (() => boolean)
   message?: string
 }
 
-type OrIfParams = Array<boolean | ObjectOrIf>
+/** use function when you need to lazy evaluate the expression */
+type OrIfParams = Array<boolean | (() => boolean) | ObjectOrIf>
 
 export function orSome<T = void>(
   conditions: OrIfParams,
@@ -16,20 +17,24 @@ export function orSome<T = void>(
   ) => T,
 ): T | void {
   const formattedConditions = conditions.map((item, index) => {
-    if (typeof item === "boolean") {
+    if (["boolean", "function"].includes(typeof item)) {
       return {
         key: index,
-        condition: item,
+        condition: typeof item === "function" ? item : () => item,
       }
     }
-    return { ...item, key: item.key ?? index }
+    return {
+      ...(item as ObjectOrIf),
+      key: (item as ObjectOrIf).key ?? index,
+      condition: () => (item as ObjectOrIf).condition,
+    }
   })
   if (!Array.isArray(formattedConditions)) {
     throw new Error("conditions must be an array")
   }
   let theIndex = null
   formattedConditions.some((item, index) => {
-    if (item.condition) {
+    if (item.condition()) {
       theIndex = index
       return true
     }

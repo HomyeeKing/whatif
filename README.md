@@ -70,7 +70,7 @@ orSome([false, false], () => {
 })
 ```
 
-But there's a difference you should notice, which is that the value will be evaluated before the `orSome` runs. So if you want to make use of the short circuit, you may use `if` statement to make judgement in advance to avoid the Uncaught error:
+But there's a difference you should notice, which is that _\*\*EVERY CONDITIONs_ will be evaluated right away. So if you want to make use of the short circuit, you may wrap a function to lazy the evaluation or just use `if` statement to make judgement in advance to avoid the Uncaught error:
 
 ```ts
 // ❌ bad case
@@ -79,10 +79,13 @@ orSome([
   { condition: foo.bar.baz, key: "two" }, // foo.bar.baz will be evaluated right now, so it will throw an error here
 ])
 
-// ✅ good case
+// ✅ good case with if statement in advance:
 if (!foo.bar) {
   return
 }
 
 orSome([{ condition: foo.bar.baz, key: "one" }], () => {})
+
+// ✅ good case with lazy evaluation:
+orSome([{ condition: () => foo.bar.baz, key: "one" }], () => {})
 ```
