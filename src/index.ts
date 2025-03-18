@@ -26,7 +26,10 @@ export function orSome<T = void>(
     return {
       ...(item as ObjectOrIf),
       key: (item as ObjectOrIf).key ?? index,
-      condition: () => (item as ObjectOrIf).condition,
+      condition:
+        typeof (item as ObjectOrIf).condition === "function"
+          ? (item as ObjectOrIf).condition
+          : () => (item as ObjectOrIf).condition,
     }
   })
   if (!Array.isArray(formattedConditions)) {
@@ -34,7 +37,7 @@ export function orSome<T = void>(
   }
   let theIndex = null
   formattedConditions.some((item, index) => {
-    if (item.condition()) {
+    if ((item.condition as () => boolean)()) {
       theIndex = index
       return true
     }
