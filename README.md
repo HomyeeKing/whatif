@@ -69,3 +69,20 @@ orSome([false, false], () => {
   // won't be called
 })
 ```
+
+But there's a difference you should notice, which is that the value will be evaluated before the `orSome` runs. So if you want to make use of the short circuit, you may use `if` statement to make judgement in advance to avoid the Uncaught error:
+
+```ts
+// ❌ bad case
+orSome([
+  { condition: !foo.bar, key: "one" },
+  { condition: foo.bar.baz, key: "two" }, // foo.bar.baz will be evaluated right now, so it will throw an error here
+])
+
+// ✅ good case
+if (!foo.bar) {
+  return
+}
+
+orSome([{ condition: foo.bar.baz, key: "one" }], () => {})
+```
